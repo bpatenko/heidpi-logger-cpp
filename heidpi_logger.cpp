@@ -118,28 +118,32 @@ void heidpi_flow_processing(const nlohmann::json& config_dict, nlohmann::json& j
     config_dict["ignore_risks"].is_array()) {
 
         auto& flow_risk = json_dict["ndpi"]["flow_risk"];
+        std::set<std::string> ignore_keys;
 
+        // Baue eine Menge aller ignorierten Keys als String auf
         for (const auto& risk : config_dict["ignore_risks"]) {
             if (risk.is_string()) {
-                const auto& key_str = risk.get<std::string>();
-                flow_risk.erase(key_str); // versuche string direkt
-
-                // zusätzlich: wenn der String eine Zahl ist, auch als int löschen
-                try {
-                    int key_int = std::stoi(key_str);
-                    flow_risk.erase(key_int); // versuche int-Schlüssel
-                } catch (...) {
-                    // kein valider Integer, ignoriere
-                }
-
+                ignore_keys.insert(risk.get<std::string>());
             } else if (risk.is_number_integer()) {
-                int key_int = risk.get<int>();
-                flow_risk.erase(key_int);
-                // optional: auch als string löschen
-                flow_risk.erase(std::to_string(key_int));
+                ignore_keys.insert(std::to_string(risk.get<int>()));
             }
         }
+
+        // Alle Keys durchgehen, vergleichen als string, dann löschen
+        std::vector<nlohmann::json::object_t::key_type> keys_to_delete;
+
+        for (auto it = flow_risk.begin(); it != flow_risk.end(); ++it) {
+            std::string key_str = it.key();
+            if (ignore_keys.count(key_str)) {
+                keys_to_delete.push_back(it.key());
+            }
+        }
+
+        for (const auto& k : keys_to_delete) {
+            flow_risk.erase(k);
+        }
     }
+
 
 
 }
