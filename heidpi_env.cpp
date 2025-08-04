@@ -4,6 +4,7 @@
 
 #include "heidpi_env.h"
 #include <cstdlib>
+#include <stdexcept>
 
 namespace heidpi_env {
 
