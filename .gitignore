@@ -1,0 +1,27 @@
+# Build files
+build/
+cmake-build-*/
+
+# CMake
+CMakeFiles/
+CMakeCache.txt
+Makefile
+install_manifest.txt
+
+# CLion
+.idea/
+*.iml
+
+# Mac
+.DS_Store
+
+# Compiled
+*.o
+*.so
+*.a
+*.bin
+*.exe
+
+# Logs
+*.log
+
