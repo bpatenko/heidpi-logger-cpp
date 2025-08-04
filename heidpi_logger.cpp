@@ -111,15 +111,19 @@ void heidpi_flow_processing(const nlohmann::json& config_dict, nlohmann::json& j
     }
 
     // flow_risk ignorieren
-    if (json_dict.contains("ndpi") && json_dict["ndpi"].contains("flow_risk") &&
-        config_dict.contains("ignore_risks") && config_dict["ignore_risks"].is_array()) {
+    if (json_dict.contains("ndpi") &&
+    json_dict["ndpi"].contains("flow_risk") &&
+    json_dict["ndpi"]["flow_risk"].is_object() &&
+    config_dict.contains("ignore_risks") &&
+    config_dict["ignore_risks"].is_array()) {
 
         for (const auto& risk : config_dict["ignore_risks"]) {
             if (risk.is_string()) {
                 json_dict["ndpi"]["flow_risk"].erase(risk.get<std::string>());
             }
         }
-        }
+    }
+
 }
 
 void heidpi_worker(
