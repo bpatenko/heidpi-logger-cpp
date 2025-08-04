@@ -117,12 +117,30 @@ void heidpi_flow_processing(const nlohmann::json& config_dict, nlohmann::json& j
     config_dict.contains("ignore_risks") &&
     config_dict["ignore_risks"].is_array()) {
 
+        auto& flow_risk = json_dict["ndpi"]["flow_risk"];
+
         for (const auto& risk : config_dict["ignore_risks"]) {
             if (risk.is_string()) {
-                json_dict["ndpi"]["flow_risk"].erase(risk.get<std::string>());
+                const auto& key_str = risk.get<std::string>();
+                flow_risk.erase(key_str); // versuche string direkt
+
+                // zusätzlich: wenn der String eine Zahl ist, auch als int löschen
+                try {
+                    int key_int = std::stoi(key_str);
+                    flow_risk.erase(key_int); // versuche int-Schlüssel
+                } catch (...) {
+                    // kein valider Integer, ignoriere
+                }
+
+            } else if (risk.is_number_integer()) {
+                int key_int = risk.get<int>();
+                flow_risk.erase(key_int);
+                // optional: auch als string löschen
+                flow_risk.erase(std::to_string(key_int));
             }
         }
     }
+
 
 }
 
